@@ -1,0 +1,426 @@
+/* ==========================================================
+  VARIABLES Y DISEÑO BASE      ========================================================================== */
+:root {
+  --bg-body: #111110;
+  --bg-island: rgba(24, 24, 22, 0.94);
+  --bg-sheet: #1c1c1a;
+  --bg-input: #2a2a27;
+  --color-text: #f0efe8;
+  --color-text-muted: #5a5a54;
+  --color-primary: #f0efe8;
+
+  --island-radius: 36px;
+  --sheet-radius: 32px;
+  --spacing-lg: 24px;
+
+  --transition-main: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  --transition-fast: all 0.2s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: -apple-system, system-ui, sans-serif;
+  background-color: var(--bg-body);
+  color: var(--color-text);
+  height: 100vh;
+  overflow: hidden;
+}
+
+main {
+  padding: var(--spacing-lg);
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* --- Iconos SVG inline --- */
+.icon {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Capa secundaria duotone */
+.icon .icon-secondary {
+  opacity: 0.35;
+}
+
+/* Iconos grandes en el sheet */
+.menu-item .icon {
+  width: 28px;
+  height: 28px;
+  margin: 0 auto 8px;
+  color: #b8a888;
+}
+
+/* Icono del toggle */
+.toggle-theme-left .icon {
+  width: 20px;
+  height: 20px;
+  color: #b8a888;
+}
+
+/* ==========================================================================
+   LA ISLA Y EL SHEET (ESTADOS)
+   ========================================================================== */
+.bottom-island {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 450px;
+  background: var(--bg-island);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 100;
+  transition: var(--transition-main);
+  box-shadow:
+    0 -1px 0 rgba(255, 255, 255, 0.06),
+    0 -10px 40px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  /* Estado Inicial: CERRADO (ISLA) */
+  bottom: 20px;
+  height: 64px;
+  border-radius: var(--island-radius);
+}
+
+.bottom-island[data-sheet-state="small"] {
+  bottom: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 380px;
+  border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
+  background: var(--bg-sheet);
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+.bottom-island[data-sheet-state="full"] {
+  bottom: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 94vh;
+  border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
+  background: var(--bg-sheet);
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+/* Handler de Gestos */
+[data-behavior="handler-area"] {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.bottom-island:not([data-sheet-state="closed"]) [data-behavior="handler-area"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.handler {
+  width: 36px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  transition: var(--transition-fast);
+}
+
+[data-behavior="handler-area"]:active .handler {
+  width: 48px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================================================
+   SISTEMA DE NAVEGACIÓN Y BÚSQUEDA
+   ========================================================================== */
+.nav-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  min-height: 64px;
+  position: relative;
+}
+
+/* Botones Circulares Base */
+.nav-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  transition: var(--transition-main);
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-primary);
+}
+.nav-btn:active {
+  transform: scale(0.88);
+}
+
+/* Botones que desaparecen al buscar */
+.main-nav-btn {
+  opacity: 1;
+  width: 48px;
+}
+.bottom-island[data-search-active="true"] .main-nav-btn {
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
+  margin: 0;
+}
+
+/* Botones de Control de Búsqueda (Satélites) */
+.search-ctrl-btn {
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  display: none;
+}
+.bottom-island[data-search-active="true"] .search-ctrl-btn {
+  width: 48px;
+  opacity: 1;
+  pointer-events: auto;
+  display: none;
+}
+
+/* LA BARRA DE BÚSQUEDA */
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  width: 48px;
+  border-radius: 24px;
+  transition: var(--transition-main);
+  cursor: pointer;
+  position: relative;
+  background: transparent;
+}
+
+.search-wrapper input {
+  width: 0;
+  opacity: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+  transition: var(--transition-main);
+  color: var(--color-text);
+}
+
+.search-wrapper input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.search-icon {
+  color: var(--color-text-muted);
+  transition: var(--transition-fast);
+  flex-shrink: 0;
+}
+
+/* Estado Activo de Búsqueda */
+.bottom-island[data-search-active="true"] .search-wrapper {
+  flex: 1;
+  width: auto;
+  background: var(--bg-input);
+  padding: 0 16px;
+  margin: 0 8px;
+  justify-content: space-between;
+  cursor: text;
+}
+
+.bottom-island[data-search-active="true"] .search-wrapper input {
+  width: 100%;
+  opacity: 1;
+  pointer-events: auto;
+  order: 1;
+}
+
+.bottom-island[data-search-active="true"] .search-wrapper .search-icon {
+  order: 2;
+  margin-left: 8px;
+}
+
+/* ==========================================================================
+   CUERPO DEL SHEET
+   ========================================================================== */
+.sheet-body {
+  flex: 1;
+  padding: 0 24px 24px;
+  overflow-y: auto;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.bottom-island:not([data-sheet-state="closed"]) .sheet-body {
+  opacity: 1;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.menu-item {
+  background: #242422;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--color-text);
+  transition: var(--transition-fast);
+  cursor: pointer;
+}
+
+.menu-item:active {
+  transform: scale(0.96);
+  background: #2e2e2b;
+}
+
+/* ==========================================================================
+   TEMA CLARO
+   ========================================================================== */
+body.theme-light {
+  --bg-body: #f4f4f5;
+  --bg-island: rgba(255, 255, 255, 0.9);
+  --bg-sheet: #ffffff;
+  --bg-input: #e4e4e7;
+  --color-text: #18181b;
+  --color-text-muted: #71717a;
+  --color-primary: #000000;
+}
+
+body.theme-light .bottom-island {
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+}
+
+body.theme-light .menu-item {
+  background: #f4f4f5;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+body.theme-light .menu-item:active {
+  background: #e8e8e8;
+}
+body.theme-light .handler {
+  background: #d4d4d8;
+}
+
+/* Toggle item en el sheet */
+.menu-item.toggle-theme {
+  grid-column: span 2;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  padding: 16px 20px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+body.theme-light .menu-item.toggle-theme {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.toggle-theme-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggle-pill {
+  width: 44px;
+  height: 26px;
+  border-radius: 13px;
+  background: #3a3a37;
+  position: relative;
+  transition: background 0.25s ease;
+  flex-shrink: 0;
+}
+
+body.theme-light .toggle-pill {
+  background: #c0c0c8;
+}
+
+.toggle-pill::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #f0efe8;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+body.theme-light .toggle-pill::after {
+  transform: translateX(18px);
+  background: #ffffff;
+}
+
+/* Scrim */
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+  z-index: 90;
+}
+body:has([data-sheet-state="full"]) .scrim,
+body:has([data-sheet-state="small"]) .scrim {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/*============*/
+
+[data-sheet-state="closed"] #handler-area {
+  display: none;
+}
+
+.bottom-island[data-search-active="true"] .search-ctrl-btn {
+  display: flex;
+}
+
+[data-sheet-state="small"] .nav-content {
+  justify-content: end;
+}

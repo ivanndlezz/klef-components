@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLEF Components Library</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --bg-color: #0a0a0c;
+            --card-bg: #161618;
+            --card-border: #2c2c2e;
+            --accent-color: #0a84ff;
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e93;
+            --transition-speed: 0.3s;
+            --ease: cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Outfit', -apple-system, system-ui, sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Background */
+        .ambient-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(10, 132, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(10, 132, 255, 0.05) 0%, transparent 40%);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 80px 24px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 80px;
+            animation: fadeInDown 1s var(--ease);
+        }
+
+        .logo-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--accent-color), #0055ff);
+            border-radius: 18px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(10, 132, 255, 0.3);
+        }
+
+        .logo-container i {
+            font-size: 32px;
+            color: white;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            background: linear-gradient(to bottom, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Components Grid */
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 32px;
+            animation: fadeInUp 1s var(--ease) 0.2s both;
+        }
+
+        .component-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 32px;
+            text-decoration: none;
+            color: inherit;
+            transition: all var(--transition-speed) var(--ease);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .component-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top left, rgba(10, 132, 255, 0.1), transparent 70%);
+            opacity: 0;
+            transition: opacity var(--transition-speed) var(--ease);
+        }
+
+        .component-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(10, 132, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .component-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            width: 52px;
+            height: 52px;
+            background: rgba(10, 132, 255, 0.1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+            font-size: 24px;
+            transition: all var(--transition-speed) var(--ease);
+        }
+
+        .component-card:hover .card-icon {
+            background: var(--accent-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .card-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .card-content p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            color: var(--accent-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+            gap: 8px;
+        }
+
+        .card-footer i {
+            transition: transform var(--transition-speed) var(--ease);
+        }
+
+        .component-card:hover .card-footer i {
+            transform: translateX(4px);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 100px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--card-border);
+            padding-top: 40px;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .container { padding: 40px 20px; }
+            .components-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <i class="ph-fill ph-circles-three-plus"></i>
+            </div>
+            <h1>KLEF Components</h1>
+            <p>Una colección curada de componentes UI premium para experiencias web interactivas y de alto rendimiento.</p>
+        </header>
+
+        <main class="components-grid">
+            <!-- Dial Selectors -->
+            <a href="./components/dial-selectors/index.html" target="_blank" rel="noopener noreferrer" class="component-card">
+                <div class="card-icon">
+                    <i class="ph ph-command"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Dial Selectors</h3>
+                    <p>Selector interactivo 3D con scroll cinético y soporte para entrada manual. Optimizado para dispositivos móviles.</p>
+                </div>
+                <div class="card-footer">
+                    Ver Demo <i class="ph ph-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- Nav Bottom Bar -->
+            <a href="./components/nav-bottom-bar/index.html" target="_blank" rel="noopener noreferrer" class="component-card">
+                <div class="card-icon">
+                    <i class="ph ph-navigation-arrow"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Nav Bottom Bar</h3>
+                    <p>Barra de navegación inferior tipo aplicación móvil con animaciones fluidas y estados activos inteligentes.</p>
+                </div>
+                <div class="card-footer">
+                    Ver Demo <i class="ph ph-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- Volume Component -->
+            <a href="./components/volume-component/index.html" target="_blank" rel="noopener noreferrer" class="component-card">
+                <div class="card-icon">
+                    <i class="ph ph-speaker-high"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Volume Component</h3>
+                    <p>Control de volumen y sliders personalizados con respuesta visual inmediata y diseño minimalista.</p>
+                </div>
+                <div class="card-footer">
+                    Ver Demo <i class="ph ph-arrow-right"></i>
+                </div>
+            </a>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 KLEF Components. Built with precision and performance in mind.</p>
+        </footer>
+    </div>
+</body>
+</html>

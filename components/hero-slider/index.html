@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hero Carousel SPA</title>
+    <base href="https://jbpoolsinc.com/" target="_blank" />
+    <style>
+      /* Reset & Base */
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --background: 0 0% 100%;
+        --foreground: 0 0% 5%;
+        --muted: 0 0% 96%;
+        --muted-foreground: 0 0% 45%;
+        --primary: 0 0% 9%;
+        --primary-foreground: 0 0% 98%;
+        --radius: 0.75rem;
+        --transition-fast: 0.2s ease;
+        --transition-medium: 0.3s ease;
+        --transition-slow: 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      html {
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+        line-height: 1.5;
+        min-height: 100vh;
+      }
+
+      /* Header */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        background: hsla(var(--background) / 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid hsl(var(--muted));
+      }
+
+      @media (min-width: 768px) {
+        .header {
+          padding: 1.25rem 2.5rem;
+        }
+      }
+
+      .logo {
+        font-size: 1.25rem;
+        font-weight: 300;
+        letter-spacing: -0.02em;
+        color: hsl(var(--foreground));
+        text-decoration: none;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .nav {
+          gap: 2rem;
+        }
+      }
+
+      .nav-link {
+        font-size: 0.875rem;
+        font-weight: 400;
+        color: hsl(var(--muted-foreground));
+        text-decoration: none;
+        transition: color var(--transition-fast);
+      }
+
+      .nav-link:hover {
+        color: hsl(var(--foreground));
+      }
+
+      /* Main */
+      .main {
+        padding: 5rem 1rem 2rem;
+      }
+
+      @media (min-width: 768px) {
+        .main {
+          padding: 6rem 2rem 2rem;
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .main {
+          padding: 6rem 3rem 2rem;
+        }
+      }
+
+      /* Carousel */
+      .carousel {
+        position: relative;
+        height: 70vh;
+        width: 100%;
+        overflow: hidden;
+        border-radius: 1rem;
+      }
+
+      @media (min-width: 768px) {
+        .carousel {
+          height: 80vh;
+          border-radius: 1.5rem;
+        }
+      }
+
+      .carousel-slides {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Slide */
+      .slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transform: scale(1.05);
+        transition:
+          opacity var(--transition-slow),
+          transform var(--transition-slow);
+        pointer-events: none;
+      }
+
+      .slide.active {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+      }
+
+      .slide-image {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .slide-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.7),
+          rgba(0, 0, 0, 0.2) 50%,
+          transparent
+        );
+      }
+
+      .slide-content {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        height: 100%;
+        padding: 1.5rem;
+        opacity: 0;
+        transform: translateY(2rem);
+        transition:
+          opacity var(--transition-slow) 0.2s,
+          transform var(--transition-slow) 0.2s;
+        padding-bottom: 50px;
+      }
+
+      @media (min-width: 768px) {
+        .slide-content {
+          padding: 2.5rem;
+          padding-bottom: 200px;
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .slide-content {
+          padding: 3.5rem;
+          padding-bottom: 200px;
+        }
+      }
+
+      .slide.active .slide-content {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .slide-topline {
+        font-size: 0.75rem;
+        font-weight: 300;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 0.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .slide-topline {
+          font-size: 0.875rem;
+          margin-bottom: 0.75rem;
+        }
+      }
+
+      .slide-name {
+        font-size: 1.875rem;
+        font-weight: 300;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        color: white;
+        max-width: 32rem;
+        margin-bottom: 1.5rem;
+      }
+
+      @media (min-width: 768px) {
+        .slide-name {
+          font-size: 3rem;
+          margin-bottom: 2rem;
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .slide-name {
+          font-size: 3.75rem;
+        }
+      }
+
+      /* CTA Button */
+      .slide-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: white;
+        color: hsl(var(--foreground));
+        border: none;
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          transform var(--transition-fast),
+          box-shadow var(--transition-fast);
+        width: fit-content;
+      }
+
+      @media (min-width: 768px) {
+        .slide-cta {
+          padding: 1rem 2rem;
+          font-size: 1rem;
+        }
+      }
+
+      .slide-cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      .slide-cta svg {
+        transition: transform var(--transition-fast);
+      }
+
+      .slide-cta:hover svg {
+        transform: translateX(4px);
+      }
+
+      /* Navigation Buttons */
+      .carousel-nav {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        transform: translateY(-50%);
+        display: none;
+        justify-content: space-between;
+        padding: 0 1.5rem;
+        z-index: 20;
+        pointer-events: none;
+      }
+
+      @media (min-width: 768px) {
+        .carousel-nav {
+          display: flex;
+          padding: 0 2.5rem;
+        }
+      }
+
+      .carousel-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        color: white;
+        cursor: pointer;
+        transition:
+          background var(--transition-fast),
+          border-color var(--transition-fast);
+        pointer-events: auto;
+      }
+
+      .carousel-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      .carousel-btn:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+
+      /* Progress Indicators */
+      .carousel-indicators {
+        position: absolute;
+        bottom: 1.5rem;
+        left: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        z-index: 20;
+      }
+
+      @media (min-width: 768px) {
+        .carousel-indicators {
+          display: none;
+        }
+      }
+
+      .indicator {
+        position: relative;
+        height: 0.25rem;
+        width: 2rem;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 9999px;
+        overflow: hidden;
+        cursor: pointer;
+        border: none;
+        padding: 0;
+      }
+
+      .indicator-progress {
+        position: absolute;
+        inset: 0;
+        background: white;
+        border-radius: 9999px;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.1s linear;
+      }
+
+      .indicator.past .indicator-progress {
+        transform: scaleX(1);
+      }
+
+      .indicator:hover {
+        background: rgba(255, 255, 255, 0.4);
+      }
+
+      .indicator:focus {
+        outline: none;
+      }
+
+      /* Thumbnail Navigation */
+      .thumbnail-nav {
+        display: none;
+      }
+
+      @media (min-width: 768px) {
+        .thumbnail-nav {
+          position: absolute;
+          bottom: 2.5rem;
+          left: 2.5rem;
+          right: 2.5rem;
+          display: flex;
+          gap: 1rem;
+          z-index: 20;
+          overflow-x: auto;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+
+        .thumbnail-nav::-webkit-scrollbar {
+          display: none;
+        }
+      }
+
+      .thumbnail {
+        position: relative;
+        flex-shrink: 0;
+        width: 180px;
+        height: 100px;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: transform var(--transition-fast);
+      }
+
+      .thumbnail:hover {
+        transform: translateY(-4px);
+      }
+
+      .thumbnail-progress-svg {
+        position: absolute;
+        top: -1px;
+        left: -2px;
+        width: calc(100% + 4px);
+        height: calc(100% + 4px);
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity var(--transition-fast);
+      }
+
+      .thumbnail.active .thumbnail-progress-svg {
+        opacity: 1;
+      }
+
+      .progress-stroke {
+        transition: stroke-dashoffset 0.1s linear;
+      }
+
+      .thumbnail-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 0.5rem;
+      }
+
+      .thumbnail-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.8),
+          transparent 50%
+        );
+        display: flex;
+        align-items: flex-end;
+        padding: 0.75rem;
+        opacity: 1;
+        transition: opacity var(--transition-fast);
+        border-radius: 0.5rem;
+      }
+
+      .thumbnail.active .thumbnail-overlay {
+        opacity: 0.5;
+      }
+
+      .thumbnail-name {
+        font-size: 0.875rem;
+        font-weight: 400;
+        color: white;
+        letter-spacing: -0.01em;
+      }
+
+      /* Mobile Thumbnail Nav */
+      .mobile-thumbnail-nav {
+        display: flex;
+        gap: 0.75rem;
+        overflow-x: auto;
+        padding: 1.5rem 1.5rem 0;
+        margin-bottom: 1rem;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .mobile-thumbnail-nav::-webkit-scrollbar {
+        display: none;
+      }
+
+      @media (min-width: 768px) {
+        .mobile-thumbnail-nav {
+          display: none;
+        }
+      }
+
+      .mobile-thumbnail {
+        position: relative;
+        flex-shrink: 0;
+        width: 120px;
+        height: 80px;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: border-color var(--transition-fast);
+      }
+
+      .mobile-thumbnail.active {
+        border-color: hsl(var(--foreground));
+      }
+
+      .mobile-thumbnail-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .mobile-thumbnail-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.7),
+          transparent 50%
+        );
+        display: flex;
+        align-items: flex-end;
+        padding: 0.5rem;
+      }
+
+      .mobile-thumbnail-name {
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Header -->
+      <header class="header" style="color: transparent">
+        <a href="#" class="logo">Studio</a>
+        <nav class="nav">
+          <a href="#work" class="nav-link">Work</a>
+          <a href="#about" class="nav-link">About</a>
+          <a href="#contact" class="nav-link">Contact</a>
+        </nav>
+      </header>
+
+      <!-- Main -->
+      <main class="main">
+        <!-- Mobile Thumbnail Navigation -->
+        <div class="mobile-thumbnail-nav" id="mobileThumbnails"></div>
+
+        <!-- Hero Carousel -->
+        <div class="carousel" id="carousel">
+          <div class="carousel-slides" id="slides"></div>
+
+          <!-- Desktop Navigation Buttons -->
+          <div class="carousel-nav">
+            <button
+              class="carousel-btn"
+              id="prevBtn"
+              aria-label="Previous slide"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+            <button class="carousel-btn" id="nextBtn" aria-label="Next slide">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Mobile Progress Indicators -->
+          <div class="carousel-indicators" id="indicators"></div>
+
+          <!-- Desktop Thumbnail Navigation -->
+          <div class="thumbnail-nav" id="thumbnails"></div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      // Slides Data
+      const slidesData = [
+        {
+          id: 1,
+          name: "54981 SOUTHERN HILLS",
+          topline: "Featured Pool Project",
+          image:
+            "https://files.kuula.io/685b-167f-2fa8-2211/01-cover.jpg?ck=952905",
+          link: "/portfolio/54981-southern-hills/",
+        },
+        {
+          id: 2,
+          name: "401 VIA MILANO",
+          topline: "Luxury Residence",
+          image:
+            "https://files.kuula.io/68e4-461f-3e03-8662/01-cover.jpg?ck=337520",
+          link: "/portfolio/401-via-milano/",
+        },
+        {
+          id: 3,
+          name: "80510 CAMINO SANTA ELISE",
+          topline: "Custom Pool & Spa",
+          image:
+            "https://files.kuula.io/6876-c24a-2a5d-4171/01-cover.jpg?ck=768866",
+          link: "/portfolio/80510-camino-santa-elise/",
+        },
+        {
+          id: 4,
+          name: "73880 FLAGSTONE LN",
+          topline: "Outdoor Living",
+          image:
+            "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80",
+          link: "/portfolio/73880-flagstone-ln/",
+        },
+        {
+          id: 5,
+          name: "44113 BERINGER DR",
+          topline: "Modern Design",
+          image:
+            "https://files.kuula.io/6837-2523-4173-6185/01-cover.jpg?ck=989812",
+          link: "/portfolio/44113-beringer-dr/",
+        },
+      ];
+
+      class HeroCarousel {
+        constructor(options = {}) {
+          this.slides = slidesData;
+          this.currentIndex = 0;
+          this.progress = 0;
+          this.isHovered = false;
+          this.autoPlayInterval = options.autoPlayInterval || 5000;
+          this.progressInterval = null;
+
+          this.init();
+        }
+
+        init() {
+          this.renderSlides();
+          this.renderIndicators();
+          this.renderThumbnails();
+          this.renderMobileThumbnails();
+          this.bindEvents();
+          this.startAutoPlay();
+        }
+
+        renderSlides() {
+          const slidesContainer = document.getElementById("slides");
+
+          slidesContainer.innerHTML = this.slides
+            .map(
+              (slide, index) => `
+          <div class="slide ${index === 0 ? "active" : ""}" data-index="${index}">
+            <div class="slide-image" style="background-image: url('${slide.image}')"></div>
+            <div class="slide-overlay"></div>
+            <div class="slide-content">
+              <p class="slide-topline">${slide.topline}</p>
+              <h2 class="slide-name">${slide.name}</h2>
+              <a href="${slide.link}" class="slide-cta">
+                View Project
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+      </svg>
+      </a>
+      </div>
+      </div>
+        `,
+            )
+            .join("");
+        }
+
+        renderIndicators() {
+          const indicatorsContainer = document.getElementById("indicators");
+
+          indicatorsContainer.innerHTML = this.slides
+            .map(
+              (_, index) => `
+          <button class="indicator ${index === 0 ? "active" : ""}" data-index="${index}" aria-label="Go to slide ${index + 1}">
+            <div class="indicator-progress"></div>
+      </button>
+        `,
+            )
+            .join("");
+        }
+
+        renderThumbnails() {
+          const thumbnailsContainer = document.getElementById("thumbnails");
+
+          thumbnailsContainer.innerHTML = this.slides
+            .map(
+              (slide, index) => `
+          <div class="thumbnail ${index === 0 ? "active" : ""}" data-index="${index}">
+            <svg class="thumbnail-progress-svg" viewBox="0 0 184 104" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="180" height="98" rx="8" stroke="white" stroke-width="2" stroke-dasharray="576" stroke-dashoffset="576" class="progress-stroke"/>
+      </svg>
+            <img src="${slide.image}" alt="${slide.name}" class="thumbnail-image">
+            <div class="thumbnail-overlay">
+              <p class="thumbnail-name">${slide.name}</p>
+      </div>
+      </div>
+        `,
+            )
+            .join("");
+        }
+
+        renderMobileThumbnails() {
+          const mobileThumbnailsContainer =
+            document.getElementById("mobileThumbnails");
+
+          mobileThumbnailsContainer.innerHTML = this.slides
+            .map(
+              (slide, index) => `
+          <div class="mobile-thumbnail ${index === 0 ? "active" : ""}" data-index="${index}">
+            <img src="${slide.image}" alt="${slide.name}" class="mobile-thumbnail-image">
+            <div class="mobile-thumbnail-overlay">
+              <p class="mobile-thumbnail-name">${slide.name}</p>
+      </div>
+      </div>
+        `,
+            )
+            .join("");
+        }
+
+        bindEvents() {
+          const carousel = document.getElementById("carousel");
+          const prevBtn = document.getElementById("prevBtn");
+          const nextBtn = document.getElementById("nextBtn");
+          const indicators = document.querySelectorAll(".indicator");
+          const thumbnails = document.querySelectorAll(".thumbnail");
+          const mobileThumbnails =
+            document.querySelectorAll(".mobile-thumbnail");
+
+          // Navigation buttons
+          prevBtn.addEventListener("click", () => this.prevSlide());
+          nextBtn.addEventListener("click", () => this.nextSlide());
+
+          // Indicator clicks
+          indicators.forEach((indicator) => {
+            indicator.addEventListener("click", (e) => {
+              const index = parseInt(e.currentTarget.dataset.index);
+              this.goToSlide(index);
+            });
+          });
+
+          // Thumbnail clicks
+          thumbnails.forEach((thumbnail) => {
+            thumbnail.addEventListener("click", (e) => {
+              const index = parseInt(e.currentTarget.dataset.index);
+              this.goToSlide(index);
+            });
+          });
+
+          // Mobile thumbnail clicks
+          mobileThumbnails.forEach((thumbnail) => {
+            thumbnail.addEventListener("click", (e) => {
+              const index = parseInt(e.currentTarget.dataset.index);
+              this.goToSlide(index);
+            });
+          });
+
+          // Hover pause
+          carousel.addEventListener("mouseenter", () => {
+            this.isHovered = true;
+          });
+
+          carousel.addEventListener("mouseleave", () => {
+            this.isHovered = false;
+          });
+
+          // Touch/Swipe support
+          let touchStartX = 0;
+          let touchEndX = 0;
+
+          carousel.addEventListener(
+            "touchstart",
+            (e) => {
+              touchStartX = e.changedTouches[0].screenX;
+            },
+            { passive: true },
+          );
+
+          carousel.addEventListener(
+            "touchend",
+            (e) => {
+              touchEndX = e.changedTouches[0].screenX;
+              this.handleSwipe(touchStartX, touchEndX);
+            },
+            { passive: true },
+          );
+
+          // Keyboard navigation
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowLeft") {
+              this.prevSlide();
+            } else if (e.key === "ArrowRight") {
+              this.nextSlide();
+            }
+          });
+        }
+
+        handleSwipe(startX, endX) {
+          const threshold = 50;
+          const diff = startX - endX;
+
+          if (Math.abs(diff) > threshold) {
+            if (diff > 0) {
+              this.nextSlide();
+            } else {
+              this.prevSlide();
+            }
+          }
+        }
+
+        nextSlide() {
+          this.goToSlide((this.currentIndex + 1) % this.slides.length);
+        }
+
+        prevSlide() {
+          this.goToSlide(
+            (this.currentIndex - 1 + this.slides.length) % this.slides.length,
+          );
+        }
+
+        goToSlide(index) {
+          const slides = document.querySelectorAll(".slide");
+          const indicators = document.querySelectorAll(".indicator");
+          const thumbnails = document.querySelectorAll(".thumbnail");
+          const mobileThumbnails =
+            document.querySelectorAll(".mobile-thumbnail");
+
+          // Update slides
+          slides[this.currentIndex].classList.remove("active");
+          slides[index].classList.add("active");
+
+          // Update indicators y resetear progreso
+          indicators.forEach((indicator, i) => {
+            indicator.classList.remove("active", "past");
+            // Resetear progreso de TODOS los indicadores
+            const progressBar = indicator.querySelector(".indicator-progress");
+            if (progressBar) {
+              progressBar.style.transform = "scaleX(0)";
+            }
+
+            if (i < index) {
+              indicator.classList.add("past");
+            } else if (i === index) {
+              indicator.classList.add("active");
+            }
+          });
+
+          // Update thumbnails y resetear stroke SVG
+          thumbnails.forEach((thumbnail, i) => {
+            thumbnail.classList.remove("active");
+            const progressStroke = thumbnail.querySelector(".progress-stroke");
+            if (progressStroke) {
+              progressStroke.setAttribute("stroke-dashoffset", "576");
+            }
+
+            if (i === index) {
+              thumbnail.classList.add("active");
+            }
+          });
+
+          // Update mobile thumbnails
+          mobileThumbnails.forEach((thumbnail, i) => {
+            thumbnail.classList.remove("active");
+            if (i === index) {
+              thumbnail.classList.add("active");
+            }
+          });
+
+          this.currentIndex = index;
+          this.progress = 0;
+          this.updateProgress();
+        }
+
+        startAutoPlay() {
+          this.progressInterval = setInterval(() => {
+            if (this.isHovered) return;
+
+            this.progress += 100 / (this.autoPlayInterval / 50);
+
+            if (this.progress >= 100) {
+              this.nextSlide();
+            } else {
+              this.updateProgress();
+            }
+          }, 50);
+        }
+
+        updateProgress() {
+          // Resetear TODOS los indicadores primero
+          const allIndicators = document.querySelectorAll(
+            ".indicator-progress",
+          );
+          allIndicators.forEach((indicator) => {
+            indicator.style.transform = "scaleX(0)";
+          });
+
+          // Solo actualizar el indicador activo (móvil)
+          const activeIndicator = document.querySelector(
+            ".indicator.active .indicator-progress",
+          );
+          if (activeIndicator) {
+            activeIndicator.style.transform = `scaleX(${this.progress / 100})`;
+          }
+
+          // Actualizar el stroke SVG del thumbnail activo (desktop)
+          const activeThumbnail = document.querySelector(".thumbnail.active");
+          if (activeThumbnail) {
+            const progressStroke =
+              activeThumbnail.querySelector(".progress-stroke");
+            if (progressStroke) {
+              const maxDashArray = 576; // Perímetro aproximado del rectángulo
+              const offset =
+                maxDashArray - maxDashArray * (this.progress / 100);
+              progressStroke.setAttribute("stroke-dashoffset", offset);
+            }
+          }
+        }
+
+        destroy() {
+          if (this.progressInterval) {
+            clearInterval(this.progressInterval);
+          }
+        }
+      }
+
+      // Initialize carousel when DOM is ready
+      document.addEventListener("DOMContentLoaded", () => {
+        window.carousel = new HeroCarousel({
+          autoPlayInterval: 5000,
+        });
+      });
+    </script>
+  </body>
+</html>

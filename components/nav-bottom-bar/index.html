@@ -2,453 +2,23 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Klef - SPA Modular Completa</title>
-    <style>
-      :root {
-        --bg-body: #ffffff;
-        --bg-island: rgba(255, 255, 255, 0.85);
-        --bg-sheet: #ffffff;
-        --bg-input: #f5f5f5;
-        --color-text: #111111;
-        --color-text-muted: #6b7280;
-        --color-primary: #111111;
-        --island-border: rgba(0, 0, 0, 0.06);
-        --island-shadow:
-          0 -1px 0 rgba(0, 0, 0, 0.04), 0 -10px 40px rgba(0, 0, 0, 0.08);
-        --handler-bg: rgba(0, 0, 0, 0.15);
-        --handler-bg-active: rgba(0, 0, 0, 0.25);
-        --island-radius: 36px;
-        --sheet-radius: 32px;
-        --spacing-lg: 24px;
-        --transition-main: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
-        --transition-fast: all 0.2s ease;
-      }
-
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        -webkit-tap-highlight-color: transparent;
-      }
-
-      body {
-        font-family: -apple-system, system-ui, sans-serif;
-        background-color: var(--bg-body);
-        color: var(--color-text);
-        height: 100vh;
-        overflow: hidden;
-      }
-
-      main {
-        padding: var(--spacing-lg);
-        height: 100%;
-        overflow-y: auto;
-      }
-
-      .icon {
-        width: 24px;
-        height: 24px;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 1.7;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        display: block;
-        flex-shrink: 0;
-      }
-
-      .icon .icon-secondary {
-        opacity: 0.35;
-      }
-
-      .menu-item .icon {
-        width: 28px;
-        height: 28px;
-        margin: 0 auto 8px;
-        color: #b8a888;
-      }
-
-      .toggle-theme-left .icon {
-        width: 20px;
-        height: 20px;
-        color: #b8a888;
-      }
-
-      .bottom-island {
-        position: fixed;
-        left: 50%;
-        transform: translateX(-50%);
-        width: calc(100% - 32px);
-        max-width: 450px;
-        background: var(--bg-island);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        z-index: 100;
-        transition: var(--transition-main);
-        box-shadow: var(--island-shadow);
-        display: flex;
-        flex-direction: column;
-        border: 1px solid var(--island-border);
-        bottom: 20px;
-        height: 64px;
-        border-radius: var(--island-radius);
-      }
-
-      .bottom-island[data-sheet-state="small"] {
-        bottom: 0;
-        width: 100%;
-        max-width: 100%;
-        height: 380px;
-        border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
-        background: var(--bg-sheet);
-        border-left: none;
-        border-right: none;
-        border-bottom: none;
-      }
-
-      .bottom-island[data-sheet-state="full"] {
-        bottom: 0;
-        width: 100%;
-        max-width: 100%;
-        height: 94vh;
-        border-radius: var(--sheet-radius) var(--sheet-radius) 0 0;
-        background: var(--bg-sheet);
-        border-left: none;
-        border-right: none;
-        border-bottom: none;
-      }
-
-      [data-behavior="handler-area"] {
-        width: 100%;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: grab;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s;
-      }
-
-      .bottom-island:not([data-sheet-state="closed"])
-        [data-behavior="handler-area"] {
-        opacity: 1;
-        pointer-events: auto;
-      }
-
-      .handler {
-        width: 36px;
-        height: 5px;
-        background: var(--handler-bg);
-        border-radius: 3px;
-        transition: var(--transition-fast);
-      }
-
-      [data-behavior="handler-area"]:active .handler {
-        width: 48px;
-        background: var(--handler-bg-active);
-      }
-
-      .nav-content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 8px;
-        min-height: 64px;
-        position: relative;
-      }
-
-      .nav-btn {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--color-text-muted);
-        transition: var(--transition-main);
-        flex-shrink: 0;
-        border: none;
-        background: transparent;
-        cursor: pointer;
-      }
-
-      .nav-btn:hover {
-        background: rgba(0, 0, 0, 0.04);
-        color: var(--color-primary);
-      }
-      .nav-btn:active {
-        transform: scale(0.88);
-      }
-
-      .main-nav-btn {
-        opacity: 1;
-        width: 48px;
-      }
-      .bottom-island[data-search-active="true"] .main-nav-btn {
-        width: 0;
-        opacity: 0;
-        pointer-events: none;
-        margin: 0;
-      }
-
-      .search-ctrl-btn {
-        width: 0;
-        opacity: 0;
-        pointer-events: none;
-        overflow: hidden;
-        display: none;
-      }
-      .bottom-island[data-search-active="true"] .search-ctrl-btn {
-        width: 48px;
-        opacity: 1;
-        pointer-events: auto;
-        display: none;
-      }
-
-      .search-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 48px;
-        width: 48px;
-        border-radius: 24px;
-        transition: var(--transition-main);
-        cursor: pointer;
-        position: relative;
-        background: transparent;
-        border: none;
-        padding: 0;
-      }
-
-      .search-wrapper input {
-        width: 0;
-        opacity: 0;
-        border: none;
-        background: transparent;
-        outline: none;
-        font-size: 16px;
-        transition: var(--transition-main);
-        color: var(--color-text);
-      }
-
-      .search-wrapper input::placeholder {
-        color: var(--color-text-muted);
-      }
-
-      .search-icon {
-        color: var(--color-text-muted);
-        transition: var(--transition-fast);
-        flex-shrink: 0;
-      }
-
-      .bottom-island[data-search-active="true"] .search-wrapper {
-        flex: 1;
-        width: auto;
-        background: var(--bg-input);
-        padding: 0 16px;
-        margin: 0 8px;
-        justify-content: space-between;
-        cursor: text;
-      }
-
-      .bottom-island[data-search-active="true"] .search-wrapper input {
-        width: 100%;
-        opacity: 1;
-        pointer-events: auto;
-        order: 1;
-      }
-
-      .bottom-island[data-search-active="true"] .search-wrapper .search-icon {
-        order: 2;
-        margin-left: 8px;
-      }
-
-      .sheet-body {
-        flex: 1;
-        padding: 0 24px 24px;
-        overflow-y: auto;
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-      .bottom-island:not([data-sheet-state="closed"]) .sheet-body {
-        opacity: 1;
-      }
-
-      .menu-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-        margin-top: 10px;
-      }
-
-      .menu-item {
-        background: #ffffff;
-        border: 1px solid #c9c9c9;
-        padding: 20px;
-        border-radius: 20px;
-        text-align: center;
-        font-weight: 600;
-        color: var(--color-text);
-        transition: var(--transition-fast);
-        cursor: pointer;
-      }
-
-      .menu-item:active {
-        transform: scale(0.96);
-        background: #f9f9f9;
-      }
-
-      body.theme-dark {
-        --bg-body: #0a0a0a;
-        --bg-island: rgba(17, 17, 17, 0.92);
-        --bg-sheet: #141414;
-        --bg-input: #1f1f1f;
-        --color-text: #f5f5f5;
-        --color-text-muted: #9ca3af;
-        --color-primary: #ffffff;
-        --island-border: rgba(255, 255, 255, 0.07);
-        --island-shadow:
-          0 -1px 0 rgb(68 68 68 / 16%), 0 13px 20px rgb(66 68 221 / 17%);
-        --handler-bg: rgba(255, 255, 255, 0.15);
-        --handler-bg-active: rgba(255, 255, 255, 0.3);
-      }
-
-      body.theme-dark .bottom-island {
-        border-color: rgba(255, 255, 255, 0.07);
-        box-shadow:
-          0 -1px 0 rgba(255, 255, 255, 0.06),
-          0 -10px 40px rgba(0, 0, 0, 0.5);
-      }
-
-      body.theme-dark .menu-item {
-        background: #1a1a1a;
-        border-color: rgba(255, 255, 255, 0.05);
-      }
-      body.theme-dark .menu-item:active {
-        background: #262626;
-      }
-      body.theme-dark .handler {
-        background: rgba(255, 255, 255, 0.15);
-      }
-
-      body.theme-dark .menu-item.toggle-theme {
-        border-top-color: rgba(255, 255, 255, 0.06);
-      }
-
-      body.theme-dark .toggle-pill {
-        background: #262626;
-      }
-
-      body.theme-dark .toggle-pill::after {
-        transform: translateX(18px);
-        background: #f5f5f5;
-      }
-
-      body.theme-dark .nav-btn:hover {
-        background: rgba(255, 255, 255, 0.04);
-      }
-
-      .menu-item.toggle-theme {
-        grid-column: span 2;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        text-align: left;
-        padding: 16px 20px;
-        margin-top: 4px;
-        border-top: 1px solid var(--island-border);
-      }
-
-      .toggle-theme-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 15px;
-        font-weight: 500;
-      }
-
-      .toggle-pill {
-        width: 44px;
-        height: 26px;
-        border-radius: 13px;
-        background: #e5e5e5;
-        position: relative;
-        transition: background 0.25s ease;
-        flex-shrink: 0;
-      }
-
-      body.theme-dark .toggle-pill {
-        background: #262626;
-      }
-
-      .toggle-pill::after {
-        content: "";
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: #ffffff;
-        top: 3px;
-        left: 3px;
-        transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-      }
-
-      body.theme-dark .toggle-pill::after {
-        transform: translateX(18px);
-        background: #f5f5f5;
-      }
-
-      .scrim {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.5);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.4s;
-        z-index: 90;
-      }
-      body:has([data-sheet-state="full"]) .scrim,
-      body:has([data-sheet-state="small"]) .scrim {
-        opacity: 1;
-        pointer-events: auto;
-      }
-
-      [data-sheet-state="closed"] #handler-area {
-        display: none;
-      }
-
-      .bottom-island[data-search-active="true"] .search-ctrl-btn {
-        display: flex;
-      }
-
-      .menu-icon {
-        transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-      }
-
-      .bottom-island[data-sheet-state="small"] .menu-icon,
-      .bottom-island[data-sheet-state="full"] .menu-icon {
-        transform: rotate(90deg);
-      }
-
-      @media screen and (max-width: 768px) {
-        input,
-        textarea,
-        select {
-          font-size: 16px !important;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
+    <!-- =======================================================================
+         SPRITE SVG — símbolos inline, sin ningún CDN
+         ======================================================================= -->
     <svg
       xmlns="http://www.w3.org/2000/svg"
       style="display: none"
       aria-hidden="true"
     >
+      <!-- house -->
       <symbol id="icon-house" viewBox="0 0 24 24">
         <path
           d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V10.5z"
@@ -457,30 +27,36 @@
         <path d="M9 22V12h6v10" />
       </symbol>
 
+      <!-- rss -->
       <symbol id="icon-rss" viewBox="0 0 24 24">
         <circle cx="5" cy="19" r="1.8" fill="currentColor" stroke="none" />
         <path d="M4 11c4.97 0 9 4.03 9 9" />
         <path d="M4 4c8.28 0 15 6.72 15 15" class="icon-secondary" />
       </symbol>
 
+      <!-- search / magnifying-glass -->
       <symbol id="icon-search" viewBox="0 0 24 24">
         <circle cx="11" cy="11" r="7" class="icon-secondary" />
         <path d="M16.5 16.5L22 22" />
       </symbol>
 
+      <!-- arrow-left -->
       <symbol id="icon-arrow-left" viewBox="0 0 24 24">
         <path d="M19 12H5" />
         <path d="M12 5l-7 7 7 7" />
       </symbol>
 
+      <!-- x / close -->
       <symbol id="icon-x" viewBox="0 0 24 24">
         <path d="M18 6L6 18M6 6l12 12" />
       </symbol>
 
+      <!-- list / hamburger -->
       <symbol id="icon-list" viewBox="0 0 24 24">
         <path d="M4 6h16M4 12h16M4 18h16" />
       </symbol>
 
+      <!-- share-network -->
       <symbol id="icon-share" viewBox="0 0 24 24">
         <circle cx="18" cy="5" r="2.5" class="icon-secondary" />
         <circle cx="6" cy="12" r="2.5" class="icon-secondary" />
@@ -488,14 +64,13 @@
         <path d="M8.4 10.8l7.2-4M8.4 13.2l7.2 4" />
       </symbol>
 
+      <!-- reload / arrows-clockwise -->
       <symbol id="icon-reload" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-        />
+        <path d="M21 3v6h-6" />
+        <path d="M21 9A9 9 0 1 1 14.36 3.64" class="icon-secondary" />
       </symbol>
 
+      <!-- gear / settings -->
       <symbol id="icon-gear" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="3" class="icon-secondary" />
         <path
@@ -503,11 +78,13 @@
         />
       </symbol>
 
+      <!-- user -->
       <symbol id="icon-user" viewBox="0 0 24 24">
         <circle cx="12" cy="8" r="4" class="icon-secondary" />
         <path d="M4 20c0-4 3.58-7 8-7s8 3 8 7" />
       </symbol>
 
+      <!-- moon -->
       <symbol id="icon-moon" viewBox="0 0 24 24">
         <path
           d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
@@ -516,6 +93,7 @@
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
       </symbol>
 
+      <!-- sun -->
       <symbol id="icon-sun" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="4" class="icon-secondary" />
         <path
@@ -523,6 +101,8 @@
         />
       </symbol>
     </svg>
+
+    <!-- ======================================================================= -->
 
     <div class="scrim" id="scrim"></div>
 
@@ -534,7 +114,9 @@
             margin-bottom: 12px;
             letter-spacing: -0.02em;
           "
-        ></h1>
+        >
+          <!-- Ingeniería Klef -->
+        </h1>
         <p
           style="
             color: var(--color-text-muted);
@@ -549,7 +131,7 @@
             background: #1e1e1c;
             padding: 20px;
             border-radius: 24px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
           "
         >
           <h3 style="margin-bottom: 8px">Instrucciones</h3>
@@ -570,11 +152,14 @@
       data-sheet-state="closed"
       data-search-active="false"
     >
+      <!-- Área Gestual -->
       <div data-behavior="handler-area" id="handler-area">
         <div class="handler"></div>
       </div>
 
+      <!-- Navegación Dinámica -->
       <div class="nav-content">
+        <!-- Botones Principales -->
         <button class="nav-btn main-nav-btn" aria-label="Inicio">
           <svg class="icon"><use href="#icon-house" /></svg>
         </button>
@@ -582,41 +167,16 @@
           <svg class="icon"><use href="#icon-rss" /></svg>
         </button>
 
+        <!-- Botón Satélite Izquierdo (Cancelar) -->
         <button
           class="nav-btn search-ctrl-btn"
           data-action="cancel-search"
-          aria-label="Cancelar búsqueda"
+          aria-label="Cancelar"
         >
           <svg class="icon"><use href="#icon-x"></use></svg>
         </button>
 
-        <button
-          class="search-wrapper"
-          id="search-trigger"
-          aria-label="Expandir búsqueda"
-          aria-expanded="false"
-          type="button"
-        >
-          <input
-            type="text"
-            id="search-input"
-            placeholder="Buscar..."
-            aria-label="Buscar"
-            autocomplete="off"
-          />
-          <svg class="icon search-icon" aria-hidden="true">
-            <use href="#icon-search" />
-          </svg>
-        </button>
-
-        <button
-          class="nav-btn search-ctrl-btn"
-          data-action="clear-search"
-          aria-label="Borrar texto de búsqueda"
-        >
-          <svg class="icon"><use href="#icon-x"></use></svg>
-        </button>
-
+        <!-- Barra de Búsqueda -->
         <div class="search-wrapper" id="search-trigger">
           <input
             type="text"
@@ -629,6 +189,7 @@
           </svg>
         </div>
 
+        <!-- Botón Satélite Derecho (Borrar) -->
         <button
           class="nav-btn search-ctrl-btn"
           data-action="clear-search"
@@ -637,50 +198,45 @@
           <svg class="icon"><use href="#icon-arrow-left" /></svg>
         </button>
 
+        <!-- Botón Menú -->
         <button
           class="nav-btn main-nav-btn"
           id="menu-trigger"
           aria-label="Menú"
         >
-          <svg class="icon menu-icon">
-            <use id="menu-icon-use" href="#icon-list" />
-          </svg>
+          <svg class="icon"><use href="#icon-list" /></svg>
         </button>
       </div>
 
+      <!-- Cuerpo del Sheet -->
       <div class="sheet-body">
         <div class="menu-grid">
-          <button class="menu-item" aria-label="Compartir contenido">
+          <div class="menu-item">
             <svg class="icon"><use href="#icon-share" /></svg>
             Compartir
-          </button>
-          <button class="menu-item" aria-label="Recargar página">
+          </div>
+          <div class="menu-item">
             <svg class="icon"><use href="#icon-reload" /></svg>
             Recargar
-          </button>
-          <button class="menu-item" aria-label="Ir a ajustes">
+          </div>
+          <div class="menu-item">
             <svg class="icon"><use href="#icon-gear" /></svg>
             Ajustes
-          </button>
-          <button class="menu-item" aria-label="Ver perfil de usuario">
+          </div>
+          <div class="menu-item">
             <svg class="icon"><use href="#icon-user" /></svg>
             Perfil
-          </button>
-          <button
-            class="menu-item toggle-theme"
-            id="theme-toggle"
-            aria-label="Activar modo oscuro"
-            role="switch"
-            aria-checked="false"
-          >
+          </div>
+          <!-- Toggle Dark / Light -->
+          <div class="menu-item toggle-theme" id="theme-toggle">
             <div class="toggle-theme-left">
               <svg class="icon" aria-hidden="true">
-                <use id="theme-icon-use" href="#icon-sun" />
+                <use id="theme-icon-use" href="#icon-moon" />
               </svg>
-              <span id="theme-label" aria-live="polite">Modo claro</span>
+              <span id="theme-label">Modo oscuro</span>
             </div>
-            <div class="toggle-pill" aria-hidden="true"></div>
-          </button>
+            <div class="toggle-pill"></div>
+          </div>
         </div>
       </div>
     </nav>
@@ -693,23 +249,10 @@
       const handlerArea = document.getElementById("handler-area");
       const scrim = document.getElementById("scrim");
 
-      const updateMenuIcon = () => {
-        const isClosed = island.dataset.sheetState === "closed";
-        const useX = !isClosed;
-        const menuIconUse = document.getElementById("menu-icon-use");
-        if (menuIconUse) {
-          menuIconUse.setAttribute("href", useX ? "#icon-x" : "#icon-list");
-        }
-        menuTrigger.setAttribute("aria-label", useX ? "Cerrar" : "Menú");
-      };
+      // --- LÓGICA DE BÚSQUEDA ---
 
       const setSearchMode = (active) => {
         island.dataset.searchActive = active;
-        searchTrigger.setAttribute("aria-expanded", active);
-        searchTrigger.setAttribute(
-          "aria-label",
-          active ? "Contraer búsqueda" : "Expandir búsqueda",
-        );
         if (active) {
           island.dataset.sheetState = "closed";
           setTimeout(() => searchInput.focus(), 100);
@@ -717,7 +260,6 @@
           searchInput.value = "";
           searchInput.blur();
         }
-        updateMenuIcon();
       };
 
       searchTrigger.addEventListener("click", () => {
@@ -727,12 +269,15 @@
       document.addEventListener("click", (e) => {
         const actionBtn = e.target.closest("[data-action]");
         if (!actionBtn) return;
+
         if (actionBtn.dataset.action === "cancel-search") setSearchMode(false);
         if (actionBtn.dataset.action === "clear-search") {
           searchInput.value = "";
           searchInput.focus();
         }
       });
+
+      // --- LÓGICA DE SHEET (3 ESTADOS) ---
 
       const toggleSheet = () => {
         setSearchMode(false);
@@ -741,46 +286,15 @@
         } else {
           island.dataset.sheetState = "small";
         }
-        updateMenuIcon();
       };
-
-      const updateThemeAria = (isDark) => {
-        const themeLabel = document.getElementById("theme-label");
-        const themeIconUse = document.getElementById("theme-icon-use");
-        const themeToggle = document.getElementById("theme-toggle");
-
-        if (themeLabel) {
-          themeLabel.textContent = isDark ? "Modo oscuro" : "Modo claro";
-        }
-        if (themeIconUse) {
-          themeIconUse.setAttribute(
-            "href",
-            isDark ? "#icon-moon" : "#icon-sun",
-          );
-        }
-        if (themeToggle) {
-          themeToggle.setAttribute("aria-checked", isDark.toString());
-          themeToggle.setAttribute(
-            "aria-label",
-            isDark ? "Activar modo claro" : "Activar modo oscuro",
-          );
-        }
-      };
-
-      themeToggle.addEventListener("click", () => {
-        isDark = !isDark;
-        document.body.classList.toggle("theme-dark", isDark);
-        updateThemeAria(isDark);
-      });
-
-      // Initialize ARIA state on load
-      updateThemeAria(false);
 
       menuTrigger.addEventListener("click", toggleSheet);
-      scrim.addEventListener("click", () => {
-        island.dataset.sheetState = "closed";
-        updateMenuIcon();
-      });
+      scrim.addEventListener(
+        "click",
+        () => (island.dataset.sheetState = "closed"),
+      );
+
+      // --- GESTOS (SWIPE) ---
 
       let startY = 0;
       let endY = 0;
@@ -788,13 +302,15 @@
       const handleSwipe = () => {
         const diff = startY - endY;
         const state = island.dataset.sheetState;
+
         if (diff > 50) {
+          // Swipe Up
           if (state === "small") island.dataset.sheetState = "full";
         } else if (diff < -50) {
+          // Swipe Down
           if (state === "full") island.dataset.sheetState = "small";
           else if (state === "small") island.dataset.sheetState = "closed";
         }
-        updateMenuIcon();
       };
 
       handlerArea.addEventListener(
@@ -811,18 +327,20 @@
         { passive: true },
       );
 
+      // --- TOGGLE TEMA ---
       const themeToggle = document.getElementById("theme-toggle");
       const themeIconUse = document.getElementById("theme-icon-use");
       const themeLabel = document.getElementById("theme-label");
-      let isDark = false;
+      let isDark = true;
 
       themeToggle.addEventListener("click", () => {
         isDark = !isDark;
-        document.body.classList.toggle("theme-dark", isDark);
+        document.body.classList.toggle("theme-light", !isDark);
         themeIconUse.setAttribute("href", isDark ? "#icon-moon" : "#icon-sun");
         themeLabel.textContent = isDark ? "Modo oscuro" : "Modo claro";
       });
 
+      // Soporte Mouse para pruebas en desktop
       handlerArea.addEventListener("mousedown", (e) => {
         startY = e.clientY;
         const up = (me) => {
@@ -832,8 +350,6 @@
         };
         document.addEventListener("mouseup", up);
       });
-
-      updateMenuIcon();
     </script>
   </body>
 </html>
