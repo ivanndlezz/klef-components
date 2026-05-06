@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Casa Valentina - Menú</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <style>
+      :root {
+        --am-color: #795548;
+        --am-accent: #ffb300; /* Ámbar */
+        --pm-color: #333333;
+        --pm-accent: #3f51b5; /* Azul */
+        --text-main: #222;
+        --text-muted: #888;
+        --border: #f0f0f0;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        background-color: #fafafa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        color: var(--text-main);
+      }
+
+      .container {
+        width: 90%;
+        max-width: 850px;
+        text-align: center;
+      }
+
+      h2 {
+        font-size: 0.9rem;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 5px;
+        margin-bottom: 50px;
+        opacity: 0.6;
+      }
+
+      .options-wrapper {
+        display: flex;
+        gap: 30px;
+        flex-direction: column;
+      }
+
+      @media (min-width: 768px) {
+        .options-wrapper {
+          flex-direction: row;
+        }
+      }
+
+      .card {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        background-color: #ffffff8a;
+        position: relative;
+        overflow: hidden;
+        border: 2px solid var(--border);
+        backdrop-filter: blur(50px);
+      }
+
+      .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        border-color: transparent;
+      }
+
+      /* Pie Chart Reloj en la esquina */
+      .clock-indicator {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid #eee;
+      }
+
+      .am-card .clock-indicator {
+        background: conic-gradient(
+          var(--am-accent) 0deg 160deg,
+          transparent 160deg 360deg
+        );
+      }
+
+      .pm-card .clock-indicator {
+        background: conic-gradient(
+          transparent 0deg 200deg,
+          var(--pm-accent) 200deg 300deg,
+          transparent 300deg 360deg
+        );
+      }
+
+      .label-semantic {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 800;
+        margin-bottom: 30px;
+      }
+
+      .icon-meta {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 25px;
+        opacity: 0.9;
+      }
+
+      /* Estructura de Timeline a la izquierda */
+      .info-box {
+        display: flex;
+        align-items: stretch;
+        gap: 20px;
+        text-align: left;
+        margin-top: 10px;
+      }
+
+      .timeline {
+        width: 4px;
+        border-radius: 4px;
+        position: relative;
+        background: #f0f0f0;
+      }
+
+      .am-card .timeline {
+        background: linear-gradient(to bottom, var(--am-accent), #ffe082);
+      }
+      .pm-card .timeline {
+        background: linear-gradient(to bottom, #7986cb, var(--pm-accent));
+      }
+
+      .time-details {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .time-row {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+      }
+      .time-row .label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+      .time-row .val {
+        font-size: 1.4rem;
+        font-weight: 800;
+      }
+
+      .am-card {
+        color: var(--am-color);
+      }
+      .pm-card {
+        color: var(--pm-color);
+      }
+
+      .days-header {
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 15px;
+        color: var(--text-muted);
+      }
+
+      .closed-note {
+        margin-top: 35px;
+        font-size: 0.8rem;
+        color: #505050;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Menú</h2>
+
+      <div class="options-wrapper">
+        <article class="card am-card">
+          <div class="clock-indicator" title="Horario Mañana"></div>
+
+          <div class="label-semantic">
+            <span class="material-symbols-rounded">light_mode</span>
+            <span>Desayunos</span>
+          </div>
+
+          <svg class="icon-meta" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M2,21H20V19H2M20,8H18V5H20M20,3H4V13A4,4 0 0,0 8,17H14A4,4 0 0,0 18,13V10H20A2,2 0 0,0 22,8V5A2,2 0 0,0 20,3Z"
+            ></path>
+          </svg>
+
+          <div class="days-header">Martes a Domingo</div>
+
+          <div class="info-box">
+            <div class="timeline"></div>
+            <div class="time-details">
+              <div class="time-row">
+                <span class="label">Apertura</span>
+                <span class="val">8:00 am</span>
+              </div>
+              <div style="height: 20px"></div>
+              <div class="time-row">
+                <span class="label">Cierre</span>
+                <span class="val">1:30 pm</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="closed-note">Lunes Cerrado</div>
+        </article>
+
+        <article class="card pm-card">
+          <div class="clock-indicator" title="Horario Noche"></div>
+
+          <div class="label-semantic">
+            <span class="material-symbols-rounded">dark_mode</span>
+            <span>Cenas</span>
+          </div>
+
+          <svg class="icon-meta" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M10,22H14V20H13V15.42C16.07,14.93 18.5,12.25 18.5,9V3H5.5V9C5.5,12.25 7.93,14.93 11,15.42V20H10V22M7.5,5H16.5V9C16.5,11.41 14.41,13.5 12,13.5C9.59,13.5 7.5,11.41 7.5,9V5Z"
+            ></path>
+          </svg>
+
+          <div class="days-header">Martes a Domingo</div>
+
+          <div class="info-box">
+            <div class="timeline"></div>
+            <div class="time-details">
+              <div class="time-row">
+                <span class="label">Apertura</span>
+                <span class="val">6:30 pm</span>
+              </div>
+              <div style="height: 20px"></div>
+              <div class="time-row">
+                <span class="label">Cierre</span>
+                <span class="val">10:00 pm</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="closed-note">Lunes Cerrado</div>
+        </article>
+      </div>
+    </div>
+  </body>
+</html>

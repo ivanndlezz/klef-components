@@ -1,0 +1,588 @@
+<html>
+  <head>
+    <style>
+      :root {
+        --otp-accent: #3483fa;
+        --otp-accent-hover: #2968c8;
+        --otp-border: rgba(0, 0, 0, 0.22);
+        --otp-border-focus: #3483fa;
+        --otp-bg: #fff;
+        --otp-text: #333;
+        --otp-muted: #6b7280;
+        --otp-error: #e24b4a;
+        --otp-success: #1d9e75;
+        --otp-btn-text: #fff;
+        --otp-surface: #f8f7f5;
+        --otp-shadow-focus: 0 0 0 3px rgba(52, 131, 250, 0.18);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --otp-border: rgba(255, 255, 255, 0.2);
+          --otp-bg: #1e1e1e;
+          --otp-text: #f0f0f0;
+          --otp-muted: #9ca3af;
+          --otp-surface: #2a2a2a;
+        }
+      }
+
+      .otp-wrapper {
+        max-width: 400px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: var(--color-background-primary);
+      }
+
+      .otp-logo {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 1.5rem;
+      }
+      .otp-logo-icon {
+        width: 28px;
+        height: 28px;
+        background: #ffe600;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a1a1a;
+      }
+      .otp-logo-text {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--color-text-primary);
+        letter-spacing: -0.3px;
+      }
+
+      .otp-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--color-text-primary);
+        margin: 0 0 6px;
+        line-height: 1.3;
+      }
+      .otp-subtitle {
+        font-size: 14px;
+        color: var(--color-text-secondary);
+        margin: 0 0 1.75rem;
+        line-height: 1.5;
+      }
+      .otp-phone-highlight {
+        color: var(--color-text-primary);
+        font-weight: 500;
+      }
+
+      .otp-fields {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 1.5rem;
+        justify-content: center;
+      }
+
+      .otp-field {
+        width: 52px;
+        height: 56px;
+        border: 1px solid var(--otp-border);
+        border-radius: 8px;
+        background: var(--color-background-secondary);
+        font-size: 22px;
+        font-weight: 600;
+        text-align: center;
+        color: var(--color-text-primary);
+        outline: none;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s,
+          background 0.15s;
+        caret-color: transparent;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      .otp-field:focus {
+        border-color: var(--otp-accent);
+        box-shadow: 0 0 0 3px rgba(52, 131, 250, 0.15);
+        background: var(--color-background-primary);
+      }
+      .otp-field.filled {
+        border-color: rgba(52, 131, 250, 0.5);
+        background: var(--color-background-primary);
+      }
+      .otp-field.otp-separator {
+        border: none;
+        background: transparent;
+        pointer-events: none;
+      }
+      .otp-separator-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--color-text-secondary);
+        opacity: 0.4;
+        margin: auto;
+      }
+      .otp-field.error {
+        border-color: var(--otp-error);
+        box-shadow: 0 0 0 3px rgba(226, 75, 74, 0.12);
+        animation: shake 0.35s ease;
+      }
+      .otp-field.success {
+        border-color: var(--otp-success);
+        background: rgba(29, 158, 117, 0.06);
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-5px);
+        }
+        40% {
+          transform: translateX(5px);
+        }
+        60% {
+          transform: translateX(-4px);
+        }
+        80% {
+          transform: translateX(4px);
+        }
+      }
+      @keyframes pop-in {
+        0% {
+          transform: scale(0.85);
+          opacity: 0.4;
+        }
+        60% {
+          transform: scale(1.08);
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .digit-pop {
+        animation: pop-in 0.18s ease forwards;
+      }
+
+      .otp-btn {
+        width: 100%;
+        height: 48px;
+        background: var(--otp-accent);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          transform 0.1s,
+          opacity 0.15s;
+        letter-spacing: 0.1px;
+        margin-bottom: 1rem;
+      }
+      .otp-btn:hover:not(:disabled) {
+        background: var(--otp-accent-hover);
+      }
+      .otp-btn:active:not(:disabled) {
+        transform: scale(0.98);
+      }
+      .otp-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .otp-btn.loading {
+        position: relative;
+        color: transparent;
+      }
+      .otp-btn.loading::after {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        top: 50%;
+        left: 50%;
+        margin: -10px 0 0 -10px;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .otp-resend {
+        text-align: center;
+        font-size: 13px;
+        color: var(--color-text-secondary);
+      }
+      .otp-resend-link {
+        color: var(--otp-accent);
+        cursor: pointer;
+        font-weight: 500;
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 13px;
+      }
+      .otp-resend-link:disabled {
+        color: var(--color-text-secondary);
+        cursor: default;
+      }
+      .otp-timer {
+        color: var(--color-text-secondary);
+        font-weight: 500;
+      }
+
+      .otp-status {
+        min-height: 20px;
+        font-size: 13px;
+        text-align: center;
+        margin-bottom: 12px;
+        transition: opacity 0.2s;
+      }
+      .otp-status.error {
+        color: var(--otp-error);
+      }
+      .otp-status.success {
+        color: var(--otp-success);
+        font-weight: 500;
+      }
+      .otp-status.empty {
+        opacity: 0;
+      }
+
+      .progress-bar {
+        height: 3px;
+        background: var(--color-border-tertiary);
+        border-radius: 2px;
+        margin-bottom: 1.75rem;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background: var(--otp-accent);
+        border-radius: 2px;
+        transition: width 0.25s ease;
+        width: 0%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="otp-wrapper">
+      <h2 class="sr-only">Formulario de verificación OTP</h2>
+
+      <div class="otp-logo">
+        <div class="otp-logo-icon">M</div>
+        <span class="otp-logo-text">MercadoPago</span>
+      </div>
+
+      <p class="otp-title">Ingresá el código</p>
+      <p class="otp-subtitle">
+        Enviamos un código de 6 dígitos a tu WhatsApp
+        <span class="otp-phone-highlight">+52 624 ••• 4821</span>
+      </p>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+      </div>
+
+      <div
+        class="otp-fields"
+        id="otpFields"
+        role="group"
+        aria-label="Código de verificación de 6 dígitos"
+      >
+        <input
+          class="otp-field"
+          type="tel"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="1"
+          aria-label="Dígito 1"
+          id="d0"
+        />
+        <input
+          class="otp-field"
+          type="tel"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="1"
+          aria-label="Dígito 2"
+          id="d1"
+        />
+        <input
+          class="otp-field"
+          type="tel"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="1"
+          aria-label="Dígito 3"
+          id="d2"
+        />
+        <div class="otp-field otp-separator" aria-hidden="true">
+          <div class="otp-separator-dot"></div>
+        </div>
+        <input
+          class="otp-field"
+          type="tel"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="1"
+          aria-label="Dígito 4"
+          id="d3"
+        />
+        <input
+          class="otp-field"
+          type="tel"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="1"
+          aria-label="Dígito 5"
+          id="d4"
+        />
+        <input
+          class="otp-field"
+          type="tel"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="1"
+          aria-label="Dígito 6"
+          id="d5"
+        />
+      </div>
+
+      <div
+        class="otp-status empty"
+        id="statusMsg"
+        role="alert"
+        aria-live="polite"
+      ></div>
+
+      <button class="otp-btn" id="verifyBtn" disabled="">Continuar</button>
+
+      <div class="otp-resend">
+        <span id="resendText">¿No recibiste el código? </span>
+        <button class="otp-resend-link" id="resendBtn" disabled="">
+          Reenviar en <span class="otp-timer" id="timerVal">38s</span>
+        </button>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const CORRECT_CODE = "123456";
+        const inputs = [
+          document.getElementById("d0"),
+          document.getElementById("d1"),
+          document.getElementById("d2"),
+          document.getElementById("d3"),
+          document.getElementById("d4"),
+          document.getElementById("d5"),
+        ];
+        const verifyBtn = document.getElementById("verifyBtn");
+        const resendBtn = document.getElementById("resendBtn");
+        const timerVal = document.getElementById("timerVal");
+        const statusMsg = document.getElementById("statusMsg");
+        const progress = document.getElementById("progress");
+
+        let timerInterval;
+
+        function getCode() {
+          return inputs.map((i) => i.value).join("");
+        }
+
+        function updateProgress() {
+          const filled = inputs.filter((i) => i.value !== "").length;
+          progress.style.width = (filled / 6) * 100 + "%";
+          verifyBtn.disabled = filled < 6;
+          inputs.forEach((i) => {
+            i.classList.toggle("filled", i.value !== "");
+          });
+        }
+
+        function showStatus(msg, type) {
+          statusMsg.textContent = msg;
+          statusMsg.className = "otp-status " + (type || "");
+        }
+
+        function clearStatus() {
+          statusMsg.textContent = "";
+          statusMsg.className = "otp-status empty";
+        }
+
+        function setError() {
+          inputs.forEach((i) => {
+            i.classList.add("error");
+            i.classList.remove("success", "filled");
+          });
+          setTimeout(() => {
+            inputs.forEach((i) => {
+              i.classList.remove("error");
+              i.value = "";
+            });
+            updateProgress();
+            clearStatus();
+            inputs[0].focus();
+          }, 1200);
+        }
+
+        function setSuccess() {
+          inputs.forEach((i) => {
+            i.classList.add("success");
+            i.classList.remove("error");
+          });
+        }
+
+        inputs.forEach((inp, idx) => {
+          inp.addEventListener("focus", () => {
+            inp.select();
+            clearStatus();
+          });
+
+          inp.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace") {
+              if (inp.value === "" && idx > 0) {
+                inputs[idx - 1].value = "";
+                inputs[idx - 1].focus();
+                updateProgress();
+              } else {
+                inp.value = "";
+                updateProgress();
+              }
+              e.preventDefault();
+            }
+            if (e.key === "ArrowLeft" && idx > 0) {
+              inputs[idx - 1].focus();
+              e.preventDefault();
+            }
+            if (e.key === "ArrowRight" && idx < 5) {
+              inputs[idx + 1].focus();
+              e.preventDefault();
+            }
+          });
+
+          inp.addEventListener("input", (e) => {
+            let val = e.target.value.replace(/\D/g, "");
+            if (val.length > 1) {
+              // paste handling
+              const digits = val.split("").slice(0, 6 - idx);
+              digits.forEach((d, i) => {
+                if (inputs[idx + i]) {
+                  inputs[idx + i].value = d;
+                  inputs[idx + i].classList.add("digit-pop");
+                  setTimeout(
+                    () => inputs[idx + i].classList.remove("digit-pop"),
+                    200,
+                  );
+                }
+              });
+              const nextIdx = Math.min(idx + digits.length, 5);
+              inputs[nextIdx].focus();
+            } else {
+              inp.value = val;
+              if (val) {
+                inp.classList.add("digit-pop");
+                setTimeout(() => inp.classList.remove("digit-pop"), 200);
+                if (idx < 5) inputs[idx + 1].focus();
+              }
+            }
+            updateProgress();
+          });
+
+          inp.addEventListener("paste", (e) => {
+            e.preventDefault();
+            const pasted = (e.clipboardData || window.clipboardData)
+              .getData("text")
+              .replace(/\D/g, "")
+              .slice(0, 6);
+            pasted.split("").forEach((d, i) => {
+              if (inputs[i]) {
+                inputs[i].value = d;
+              }
+            });
+            const focusIdx = Math.min(pasted.length, 5);
+            inputs[focusIdx].focus();
+            updateProgress();
+          });
+        });
+
+        verifyBtn.addEventListener("click", () => {
+          const code = getCode();
+          verifyBtn.classList.add("loading");
+          verifyBtn.disabled = true;
+
+          setTimeout(() => {
+            verifyBtn.classList.remove("loading");
+            if (code === CORRECT_CODE) {
+              setSuccess();
+              showStatus("✓ Código verificado correctamente", "success");
+              verifyBtn.textContent = "✓ Verificado";
+              verifyBtn.style.background = "#1D9E75";
+            } else {
+              showStatus("Código incorrecto. Volvé a intentarlo.", "error");
+              setError();
+              verifyBtn.disabled = false;
+            }
+          }, 1400);
+        });
+
+        function startTimer(seconds) {
+          clearInterval(timerInterval);
+          resendBtn.disabled = true;
+          let remaining = seconds;
+          timerVal.textContent = remaining + "s";
+          timerInterval = setInterval(() => {
+            remaining--;
+            if (remaining <= 0) {
+              clearInterval(timerInterval);
+              resendBtn.disabled = false;
+              resendBtn.innerHTML = "Reenviar código";
+            } else {
+              timerVal.textContent = remaining + "s";
+            }
+          }, 1000);
+        }
+
+        resendBtn.addEventListener("click", () => {
+          if (resendBtn.disabled) return;
+          inputs.forEach((i) => {
+            i.value = "";
+            i.classList.remove("success", "error", "filled");
+          });
+          updateProgress();
+          clearStatus();
+          resendBtn.innerHTML =
+            'Reenviar en <span class="otp-timer" id="timerVal">45s</span>';
+          const newTimer = document.getElementById("timerVal");
+          resendBtn.disabled = true;
+          let remaining = 45;
+          newTimer.textContent = remaining + "s";
+          timerInterval = setInterval(() => {
+            remaining--;
+            if (remaining <= 0) {
+              clearInterval(timerInterval);
+              resendBtn.disabled = false;
+              resendBtn.innerHTML = "Reenviar código";
+            } else {
+              newTimer.textContent = remaining + "s";
+            }
+          }, 1000);
+          inputs[0].focus();
+          showStatus("Código reenviado por WhatsApp", "success");
+          setTimeout(clearStatus, 3000);
+        });
+
+        startTimer(45);
+        inputs[0].focus();
+      })();
+    </script>
+  </body>
+</html>
